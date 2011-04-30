@@ -1,10 +1,4 @@
-(* 
-  Nicholas Wong
-  UID: 403-600-605
-  UCLA 
-  CS 132
-   SPRING 2011
-*)
+
 
 type terminal =
   | NUM 
