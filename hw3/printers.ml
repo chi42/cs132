@@ -23,13 +23,13 @@ let debug_print_var arg =
 
 let array_alloc_func lc= 
 (* we need to check for attempts to declare array to large 
- * which is anything > 2^32 / 4  - 1
+ * which is anything > (2^32 - 1) / 4 
  * because we cannot address anything larger then that
  * also, then negative values get treated as large signed int *)
   Printf.printf 
 "
 func l_array_alloc(siz)
-  t.0 = Lt(siz 1073741824)
+  t.0 = Lt(siz 1073741823)
   if t.0 goto :laa_lbl%d
     Error(\"array alloc out of bounds\")
   laa_lbl%d:

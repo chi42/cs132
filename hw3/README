@@ -4,11 +4,23 @@ ocamlc
 ocamllex
 ocamlyacc
 GNU make
+
 ********************* build instructions ***************************
 make
+
 ******************* execution instructions *************************
 ./J2V
 
 - reads from standard input, prints to standard out 
 - on failure, immediately exits with "1" 
 - on success, returns 0
+
+*************************** other **********************************
+- the maximum allowed size of an array is (2^32 - 1) / 4
+  because an integer is 4 bytes in java and vapor is bounded by
+  the maximum size of a word (also 4 bytes) when addressing 
+  an offset into an array 
+- note that (2^32 - 1) / 4  is greater then (2^31 - 1) (the max size
+  of an unsigned int)
+
+- redid parser to be more functional, and not uses classes
