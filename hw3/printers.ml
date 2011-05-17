@@ -29,7 +29,7 @@ let array_alloc_func lc=
   Printf.printf 
 "
 func l_array_alloc(siz)
-  t.0 = Lt(siz 1073741823)
+  t.0 = Lt(siz 1073741824)
   if t.0 goto :laa_lbl%d
     Error(\"array alloc out of bounds\")
   laa_lbl%d:
