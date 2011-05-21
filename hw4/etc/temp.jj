@@ -1,0 +1,64 @@
+// -------------------------------------------------------------
+// Tokens
+
+// Whitespace and Comments
+
+<DEFAULT> SKIP : {
+" "
+| "\t"
+| <LineComment: "//" (~["\n","\r"])*>
+| <BlockComment: "/*" (~["*"])* "*" ("*" | ~["*","/"] (~["*"])* "*")* "/">
+}
+
+   
+
+<DEFAULT> TOKEN : {
+<#Digit: ["0"-"9"]>
+| <Digits: (<Digit>)+>
+| <NegDigits: "-" <Digits>> : {
+| <#IdentHead: ["a"-"z","A"-"Z","_"]>
+| <#IdentRest: <IdentHead> | <Digit> | ".">
+| <Eol: (("\r")* "\n" ([" ","\t"])*)+>
+}
+
+   
+
+<DEFAULT> MORE : {
+<LitStrStart: "\""> : WITHIN_STRING
+}
+
+   
+
+<WITHIN_STRING> TOKEN : {
+<LitStr: "\""> : DEFAULT
+}
+
+   
+
+<WITHIN_STRING> MORE : {
+<EscapeQuote: "\\\""> : {
+| <EscapeBackslash: "\\\\"> : {
+| <NormalStringContent: [" "-"~"]>
+}
+
+   
+
+// -------------------------------------------------------------
+
+<DEFAULT> TOKEN : {
+<#Ident: <IdentHead> (<IdentRest>)*>
+| <RegIdent: "$" <Ident>> : {
+| <CodeLabelIdent: <Ident> ":"> : {
+| <LabelRefIdent: ":" <Ident>> : {
+| <PlainIdent: <Ident>>
+}
+
+   
+
+// Catch-all token.
+
+<*> TOKEN : {
+<Anything: ~[]>
+}
+
+   
