@@ -1,5 +1,5 @@
 {
-  open Vapor (* Assumes the parser file is "vapor.mly". *)
+  open Vapor_parser (* Assumes the parser file is "vapor_parser.mly". *)
 }
 (* BNF for vaporparser.jj avaliable at: 
  * http://cs.ucla.edu/classes/spring11/cs132/kannan/vapor-grammar.html *)
@@ -19,6 +19,22 @@ let ident_rest = (ident_head | digit | '.')
 let eol = (('\r')* '\n' ([' ' '\t'])*)+
 
 rule token =  parse
-  | 
+  | "const"     { CONST }
+  | "var"       { VAR } 
+  | "func"      { FUNC } 
+  | "in"        { IN }
+  | "out"       { OUT }
+  | "local"     { LOCAL}
+  | "="         { EQUAL }
+  | "+"         { PLUS }
+  | "-"         { MINUS }
+  | "if"        { IF }
+  | "if0"       { IF_NOT }
+  | "goto"      { GOTO } 
+  | "call"      { CALL } 
+  | "ret"       { RET } 
+  | "("         { LPAREN }
+  | ")"         { RPAREN } 
+  
 
 

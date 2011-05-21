@@ -1,2 +1,0 @@
--- using vapor.jar
-  java -jar vapor.jar -run <name_of_vapor_file>
