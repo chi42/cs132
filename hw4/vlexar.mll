@@ -1,5 +1,5 @@
 {
-  open Vapor_tokens 
+  open Vtokens
 }
 (* BNF for vaporparser.jj avaliable at: 
  * http://cs.ucla.edu/classes/spring11/cs132/kannan/vapor-grammar.html *)
@@ -21,6 +21,9 @@ rule token = parse
     (* end of line *)
   | (('\r')* '\n' ([' ' '\t'])*)+ 
     { EOL } 
+    (* end of file *)
+  | eof
+  { EOF } 
     (* numbers, positive and negative *)
   | ("-" digits) as str
     { NEG_DIGITS str } 

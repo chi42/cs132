@@ -1,8 +1,8 @@
 BIN = V2VM
 
-OBJECTS = vtokens.cmo vlexar.cmo vparser.cmo 
+OBJECTS = vtokens.cmo vtypes.cmo vlexar.cmo vparser.cmo 
 
-CMIS = vtokens.cmi vlexar.cmi vparser.cmi 
+CMIS = vtokens.cmi vlexar.cmi vparser.cmi vtypes.cmo
 
 YACC = ocamlyacc
 LEX = ocamllex
@@ -13,7 +13,10 @@ all : $(BIN)
 $(BIN) : $(OBJECTS)
 	$(CC) -o $(BIN) $(OBJECTS)
 
-vapor_tokens.cmo: vtokens.ml
+vtypes.cmo: vtypes.ml 
+	$(CC) -c vtypes.ml
+
+vtokens.cmo: vtokens.ml
 	$(CC) -c vtokens.ml
 
 vlexar.cmo: vlexar.mll vtokens.ml
