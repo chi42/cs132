@@ -40,7 +40,7 @@ rule token = parse
     { LABEL_REF_IDENT str }
     (* strings *)
   | '"'("\\\"" | [' '-'~'] )* '"' as str
-    { STR str }  
+    { LIT_STR str }  
     (* reserved keywords *)
   | "const"     { CONST }
   | "var"       { VAR } 

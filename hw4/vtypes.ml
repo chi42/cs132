@@ -6,7 +6,7 @@ type t_nodes =
   | T_out
   | T_local
   | T_if
-  | T_if0
+  | T_if_not
   | T_func
   | T_goto
   | T_ret 
