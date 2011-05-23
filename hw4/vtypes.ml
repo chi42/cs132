@@ -11,6 +11,8 @@ type t_nodes =
   | T_goto
   | T_ret 
   | T_call
+  | T_plus
+  | T_minus
 
   | Cl_and_instr of t_nodes * t_nodes
   
@@ -55,8 +57,8 @@ type t_nodes =
   | Var_ref_no_reg of t_nodes
   | Operand_no_reg of t_nodes
   | Lit_int of t_nodes
-  | Lit_str of t_nodes
+  | Lit_str of string 
   | Ident of t_nodes
-  | Code_label of t_nodes
+  | Code_label of string 
   | Eol of t_nodes list
  

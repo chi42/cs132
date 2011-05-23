@@ -1,5 +1,5 @@
 {
-  open Vtokens
+  open Vparser
 }
 (* BNF for vaporparser.jj avaliable at: 
  * http://cs.ucla.edu/classes/spring11/cs132/kannan/vapor-grammar.html *)

@@ -1,6 +1,7 @@
 %{ 
   open Vtypes
-  open Vparser
+  open Vlexar
+  open Exceptions
 
   let parse_error s = 
     (* REMOVE 'FORE SUBMISSION *)
@@ -60,7 +61,7 @@ p_func_or_ds:
 //(* DataSegment ::= ( "const" | "var" ) Ident Eol ( ( DataValue )+ Eol )* *)
 data_segment:
   | ds_const_or_var ident eol dv_eol_star
-    { Data_segment $1 $2 $4 } 
+    { Data_segment ($1,$2,$4)} 
 
 ds_const_or_var:
   | CONST
@@ -89,7 +90,7 @@ dv_plus_follow:
 // * | Instr ) )* *)
 func: 
   | FUNC ident func1_wrapper func2_wrapper eol func3_wrapper 
-    { Function $2 $3 $4 $6 }
+    { Function ($2,$3,$4,$6) }
 
 func1_wrapper: 
   | LPAREN vrnr_star RPAREN 
@@ -110,13 +111,14 @@ func2_wrapper:
     { [] } 
 
 func3_wrapper:
-  | code_label func3_follow 
+  | code_label func3_follow  func3_wrapper
     { match $2 with 
-      | [] -> Code_label $1
-      | [a] -> Cl_and_instr $1 a
+      | [] -> $1::$3
+      | [a] -> (Cl_and_instr ($1,a))::$3
+      | _ -> raise (My_parse_error "func3_wrapper")
     }
-  | instr 
-    { Instr $1 } 
+  | instr func3_wrapper
+    { (Instr $1)::$2 } 
   | 
     { [] } 
 
@@ -143,16 +145,18 @@ instr:
     { Instr $1 } 
   | call
     { Instr $1 } 
+  | builtin
+    { Instr $1 } 
 
 //(* MemRead ::= VarRef "=" MemRef Eol *)
 mem_read: 
   | var_ref EQUAL mem_ref eol  
-    { Mem_read $1 $3 }
+    { Mem_read ($1,$3) }
 
 //(* MemWrite ::= MemRef "=" Operand Eol *)
 mem_write:
   | mem_ref EQUAL operand eol 
-    { Mem_write $1 $3 }
+    { Mem_write ($1,$3) }
 
 //(* MemRef ::= ( StackMemRef | GlobalMemRef ) *)
 mem_ref:
@@ -164,32 +168,32 @@ mem_ref:
 //(* StackMemRef ::= ( "in" | "out" | "local" ) "[" <Digits> "]" *)
 stack_mem_ref:
   | IN LBRACKET DIGITS RBRACKET
-    { Stack_mem_ref T_in (Digits $3) } 
+    { Stack_mem_ref (T_in,(Digits $3)) } 
   | OUT LBRACKET DIGITS RBRACKET
-    { Stack_mem_ref T_out (Digits $3) }
+    { Stack_mem_ref (T_out,(Digits $3)) }
   | LOCAL LBRACKET DIGITS RBRACKET
-    { Stack_mem_ref T_local (Digits $3) } 
+    { Stack_mem_ref (T_local,(Digits $3)) } 
 
 //(* GlobalMemRef ::= "[" DataAddr ( ( "+" | "-" ) <Digits> )? "]" *)
 global_mem_ref:
   | LBRACKET data_addr gmf_1 RBRACKET 
-    { Global_mem_ref $2 $3 } 
+    { Global_mem_ref ($2,$3) } 
 
 gmf_1:
   | PLUS DIGITS
-    { [(Plus,(Digits $2))] }
+    { [(T_plus,(Digits $2))] }
   | MINUS DIGITS
-    { [(Minus,(Digits $2))] }
+    { [(T_minus,(Digits $2))] }
 
 //(* Assign ::= VarRef "=" Operand Eol *)
 assign:
   | var_ref EQUAL operand eol 
-    { Assign $1 $3 } 
+    { Assign ($1,$3) } 
 
 //(* Branch ::= ( "if" | "if0" ) Operand "goto" CodeLabelRef Eol *)
 branch: 
   | if_ifnot operand GOTO code_label_ref eol 
-    { Branch $1 $2 $4 } 
+    { Branch ($1,$2,$4) } 
 
 if_ifnot:
   | IF
@@ -206,7 +210,7 @@ goto:
 // *              )? Eol *)
 call:
   | call_1 CALL func_addr call_2 eol 
-    { Call $1 $3 $4 }
+    { Call ($1,$3,$4) }
     
 call_1:
   | var_ref_no_reg EQUAL
@@ -219,7 +223,23 @@ call_2:
     { $2::$4 } 
   | 
     { [] }
+
 //(* BuiltIn   ::=   ( VarRef "=" )? Ident "(" ( Operand )* ")" Eol *)
+builtin:
+  | builtin_1 ident LPAREN builtin_2 RPAREN eol
+    { Builtin ($1,$2,$4) } 
+
+builtin_1:
+  | var_ref EQUAL
+    { [$1] }
+  | 
+    { [] }
+
+builtin_2:
+  | operand builtin_2
+    { $1::$2 }
+  | 
+    { [] }
 
 //(* Return  ::=   "ret" ( OperandNoReg )? Eol *)
 return: 
@@ -253,7 +273,7 @@ operand:
 //(* LabelRef  ::=   <LabelRefIdent> *)
 label_ref:
   | LABEL_REF_IDENT
-    { Labe_ref (Label_ref_ident $1) } 
+    { Label_ref (Label_ref_ident $1) } 
 
 //(* CodeAddr  ::=   ( CodeLabelRef | VarRef ) *)
 code_addr:
@@ -352,7 +372,7 @@ ident:
 //(* CodeLabel   ::=   <CodeLabelIdent> *)
 code_label:
   | CODE_LABEL_IDENT 
-    { Code_label (Code_label_indent $1) } 
+    { Code_label $1 } 
 
 //(* Eol ::= ( <Eol> )+ *)
 
