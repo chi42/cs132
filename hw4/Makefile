@@ -1,8 +1,8 @@
 BIN = V2VM
 
-OBJECTS = vtokens.cmo vtypes.cmo vlexar.cmo vparser.cmo 
+OBJECTS = vtypes.cmo vlexar.cmo vparser.cmo 
 
-CMIS = vtokens.cmi vlexar.cmi vparser.cmi vtypes.cmo
+CMIS = vlexar.cmi vparser.cmi vtypes.cmi
 
 YACC = ocamlyacc
 LEX = ocamllex
@@ -16,16 +16,13 @@ $(BIN) : $(OBJECTS)
 vtypes.cmo: vtypes.ml 
 	$(CC) -c vtypes.ml
 
-vtokens.cmo: vtokens.ml
-	$(CC) -c vtokens.ml
-
-vlexar.cmo: vlexar.mll vtokens.ml
+vlexar.cmo: vlexar.mll vtypes.ml
 	$(LEX) vlexar.mll
-	$(CC) -c vlexar.ml
 
-vparser.cmo: vparser.mly vlexar.mll vtokens.ml 
+vparser.cmo: vparser.mly vlexar.mll vtypes.ml
 	$(YACC) vparser.mly
 	$(CC) -c vparser.mli
+	$(CC) -c vlexar.ml
 	$(CC) -c vparser.ml
 
 clean:

@@ -11,6 +11,8 @@ type t_nodes =
   | T_goto
   | T_ret 
   | T_call
+
+  | Cl_and_instr of t_nodes * t_nodes
   
   | Neg_digits of string
   | Digits of string
@@ -20,7 +22,7 @@ type t_nodes =
   | Label_ref_ident of string
 
   | Program of (t_nodes list) 
-  | Data_segment of t_nodes * t_nodes * (t_nodes list)
+  | Data_segment of t_nodes * t_nodes * ((t_nodes list) list)
 
   | Function of t_nodes * (t_nodes list) * 
       ((t_nodes * t_nodes * t_nodes) list) * (t_nodes list)

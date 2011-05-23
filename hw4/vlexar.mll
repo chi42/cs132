@@ -60,5 +60,6 @@ rule token = parse
   | ")"         { RPAREN } 
   | "["         { LBRACKET }
   | "]"         { RBRACKET } 
+  | ","         { COMMA } 
 
 

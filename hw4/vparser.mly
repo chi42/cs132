@@ -1,5 +1,5 @@
 %{ 
-  open Vtokens
+  open Vtypes
   open Vparser
 
   let parse_error s = 
@@ -8,15 +8,45 @@
     flush stdout
 %}
 
-%start porgram
+%token 
+  COMMA
+  CONST
+  VAR
+  FUNC
+  IN
+  OUT
+  LOCAL
+  EQUAL
+  PLUS
+  MINUS
+  IF
+  IF_NOT
+  GOTO
+  CALL
+  RET
+  LPAREN
+  RPAREN
+  LBRACKET
+  RBRACKET
+  EOL 
+  EOF 
+
+%token <string> NEG_DIGITS
+%token <string> DIGITS of string
+%token <string> PLAIN_IDENT 
+%token <string> REG_IDENT 
+%token <string> CODE_LABEL_IDENT 
+%token <string> LABEL_REF_IDENT 
+%token <string> STR 
+
+%start program
 %type <Vtokens.t_nodes> program
 
 %%
-BNF for VaporParser.jj
-NON-TERMINALS
-(* Program ::= ( Eol )? ( Function | DataSegment )* <EOF> *)
+
+//(* Program ::= ( Eol )? ( Function | DataSegment )* <EOF> *)
 program: 
-  | eol_follow p_func_or_ds EOF
+  | eol_question p_func_or_ds EOF
     { Program $2 }
 
 p_func_or_ds:
@@ -27,9 +57,10 @@ p_func_or_ds:
   | 
     { [] }
 
-(* DataSegment ::= ( "const" | "var" ) Ident Eol ( ( DataValue )+ Eol )* *)
+//(* DataSegment ::= ( "const" | "var" ) Ident Eol ( ( DataValue )+ Eol )* *)
 data_segment:
   | ds_const_or_var ident eol dv_eol_star
+    { Data_segment $1 $2 $4 } 
 
 ds_const_or_var:
   | CONST
@@ -39,9 +70,9 @@ ds_const_or_var:
 
 dv_eol_star: 
   | dv_plus eol dv_eol_star 
-    {  }
+    { $1::$3 }
   | 
-    {} 
+    { [] } 
 
 dv_plus: 
   | data_value dv_plus_follow
@@ -53,78 +84,149 @@ dv_plus_follow:
   | 
     { [] }
 
-(* Function ::= "func" Ident ( "(" ( VarRefNoReg )* ")" )? ( "[" "in" <Digits>
- * "," "out" <Digits> "," "local" <Digits> "]" )? Eol ( ( CodeLabel ( Eol | Instr )
- * | Instr ) )* *)
+//(* Function ::= "func" Ident ( "(" ( VarRefNoReg )* ")" )? ( "[" "in" <Digits>
+// * "," "out" <Digits> "," "local" <Digits> "]" )? Eol ( ( CodeLabel ( Eol | Instr )
+// * | Instr ) )* *)
+func: 
+  | FUNC ident func1_wrapper func2_wrapper eol func3_wrapper 
+    { Function $2 $3 $4 $6 }
 
-(* Instr ::= ( Return | MemRead | MemWrite | Assign | Branch | Goto | Call | 
- * BuiltIn ) *)
+func1_wrapper: 
+  | LPAREN vrnr_star RPAREN 
+    { $1 }
+  | 
+    { [] }
 
-(* MemRead ::= VarRef "=" MemRef Eol *)
+vrnr_star:
+  | var_ref_no_reg vrnr_star
+    { $1::$2 }
+  | 
+    { [] } 
 
-(* MemWrite ::= MemRef "=" Operand Eol *)
+func2_wrapper: 
+  | LBRACKET IN digits COMMA OUT digits COMMA LOCAL digits RBRACKET
+    { [($3,$6,$9)] }  
+  | 
+    { [] } 
 
-(* MemRef ::= ( StackMemRef | GlobalMemRef ) *)
+func3_wrapper:
+  | code_label func3_follow 
+    { match $2 with 
+      | [] -> Code_label $1
+      | [a] -> Cl_and_instr $1 a
+    }
+  | instr 
+    { Instr $1 } 
+  | 
+    { [] } 
 
-(* StackMemRef ::= ( "in" | "out" | "local" ) "[" <Digits> "]" *)
+func3_follow: 
+  | eol  
+    { [] } 
+  | instr
+    { [$1] } 
 
-(* GlobalMemRef ::= "[" DataAddr ( ( "+" | "-" ) <Digits> )? "]" *)
+//(* Instr ::= ( Return | MemRead | MemWrite | Assign | Branch | Goto | Call | 
+// * BuiltIn ) *)
+instr:
+  | return  
+    { $1 } 
+  | memread 
+    { $1 } 
+  | memwrite
+    { $1 } 
+  | assign
+    { $1 } 
+  | branch
+    { $1 } 
+  | goto
+    { $1 } 
+  | call
+    { $1 } 
 
-(* Assign ::= VarRef "=" Operand Eol *)
+//(* MemRead ::= VarRef "=" MemRef Eol *)
+mem_read: 
+  | var_ref EQUAL mem_ref eol  
+    { Mem_read $1 $3 }
 
-(* Branch ::= ( "if" | "if0" ) Operand "goto" CodeLabelRef Eol *)
+//(* MemWrite ::= MemRef "=" Operand Eol *)
+mem_write:
+  | mem_ref EQUAL operand eol 
+    { Mem_write $1 $3 }
 
-(* Goto ::= "goto" CodeAddr Eol *)
+//(* MemRef ::= ( StackMemRef | GlobalMemRef ) *)
+mem_ref:
+  | stack_mem_ref 
+    { $1 }
+  | global_mem_ref 
+    { $1 }
 
-(* Call ::= ( VarRefNoReg "=" )? "call" FuncAddr ( "(" ( OperandNoReg )* ")"
- *              )? Eol *)
+//(* StackMemRef ::= ( "in" | "out" | "local" ) "[" <Digits> "]" *)
 
-(* BuiltIn   ::=   ( VarRef "=" )? Ident "(" ( Operand )* ")" Eol *)
+//(* GlobalMemRef ::= "[" DataAddr ( ( "+" | "-" ) <Digits> )? "]" *)
 
-(* Return  ::=   "ret" ( OperandNoReg )? Eol *)
+//(* Assign ::= VarRef "=" Operand Eol *)
 
-(* DataValue   ::=   ( LabelRef | LitInt ) *)
+//(* Branch ::= ( "if" | "if0" ) Operand "goto" CodeLabelRef Eol *)
 
-(* Operand   ::=   ( LabelRef | LitInt | LitStr | VarRef ) *)
+//(* Goto ::= "goto" CodeAddr Eol *)
 
-(* LabelRef  ::=   <LabelRefIdent> *)
+//(* Call ::= ( VarRefNoReg "=" )? "call" FuncAddr ( "(" ( OperandNoReg )* ")"
+// *              )? Eol *)
 
-(* CodeAddr  ::=   ( CodeLabelRef | VarRef ) *)
+//(* BuiltIn   ::=   ( VarRef "=" )? Ident "(" ( Operand )* ")" Eol *)
 
-(* DataAddr  ::=   ( DataSegmentRef | VarRef ) *)
+//(* Return  ::=   "ret" ( OperandNoReg )? Eol *)
 
-(* FuncAddr  ::=   ( FuncRef | VarRef ) *)
+//(* DataValue   ::=   ( LabelRef | LitInt ) *)
 
-(* CodeLabelRef  ::=   <LabelRefIdent> *)
+//(* Operand   ::=   ( LabelRef | LitInt | LitStr | VarRef ) *)
 
-(* DataSegmentRef  ::=   <LabelRefIdent> *)
+//(* LabelRef  ::=   <LabelRefIdent> *)
 
-(* FuncRef   ::=   <LabelRefIdent> *)
+//(* CodeAddr  ::=   ( CodeLabelRef | VarRef ) *)
 
-(* VarRef  ::=   ( Ident | <RegIdent> ) *)
+//(* DataAddr  ::=   ( DataSegmentRef | VarRef ) *)
 
-(* VarRefNoReg   ::=   VarRef *)
+//(* FuncAddr  ::=   ( FuncRef | VarRef ) *)
 
-(* OperandNoReg  ::=   Operand *)
+//(* CodeLabelRef  ::=   <LabelRefIdent> *)
 
-(* LitInt  ::=   ( <Digits> | <NegDigits> ) *) 
+//(* DataSegmentRef  ::=   <LabelRefIdent> *)
 
-(* LitStr  ::=   <LitStr> *)
+//(* FuncRef   ::=   <LabelRefIdent> *)
 
-(* Ident ::= ( <PlainIdent> | "func" | "const" | "var" | "in" | "out" | "local"
- *         | "if" | "if0" | "goto" | "ret" | "call" ) *)
+//(* VarRef  ::=   ( Ident | <RegIdent> ) *)
 
-(* CodeLabel   ::=   <CodeLabelIdent> *)
+//(* VarRefNoReg   ::=   VarRef *)
 
-(* Eol ::= ( <Eol> )+ *)
+//(* OperandNoReg  ::=   Operand *)
+
+//(* LitInt  ::=   ( <Digits> | <NegDigits> ) *) 
+
+//(* LitStr  ::=   <LitStr> *)
+
+//(* Ident ::= ( <PlainIdent> | "func" | "const" | "var" | "in" | "out" | "local"
+// *         | "if" | "if0" | "goto" | "ret" | "call" ) *)
+
+//(* CodeLabel   ::=   <CodeLabelIdent> *)
+
+//(* Eol ::= ( <Eol> )+ *)
+
 eol: 
-  | EOL eol_follow
+  | EOL eol_star
     {} 
 
-eol_follow:
-  | eol 
+eol_star:
+  | eol  
+    {}
   | 
     {} 
 
-   
+eol_question:
+  | EOL  
+    {}
+  | 
+    {} 
+
 
