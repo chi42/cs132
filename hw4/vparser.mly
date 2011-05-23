@@ -202,9 +202,19 @@ instr:
   | IF_NOT LPAREN builtin_2 RPAREN eol 
     { Builtin ([],(Plain_ident "if0"),$3) } 
 
+  | PLAIN_IDENT instr_ident_follow 
+
+  | 
+  
+( <PlainIdent> | "func" | "const" | "var" | 
+
+  | global_mem_ref EQUAL operand eol
+    { Mem_write ((Mem_ref $1),$3) } 
+  | CALL func_addr call_2 eol 
+    { Call ([],$2,$3) }
 
 
- 
+
 //(* Assign ::= VarRef "=" Operand Eol *)
 //(* MemRead ::= VarRef "=" MemRef Eol *)
 //(* MemWrite ::= MemRef "=" Operand Eol *)
