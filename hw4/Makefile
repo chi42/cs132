@@ -2,7 +2,7 @@ BIN = V2VM
 
 OBJECTS = exceptions.cmo vtypes.cmo vlexar.cmo vparser.cmo 
 
-CMIS = vlexar.cmi vparser.cmi vtypes.cmi
+CMIS = vlexar.cmi vparser.cmi vtypes.cmi exceptions.cmi
 
 MLIS = vparser.mli
 
@@ -33,6 +33,7 @@ vparser.cmo: vparser.mly vlexar.mll vtypes.ml exceptions.ml
 clean:
 	@- $(RM) $(OBJECTS) $(CMIS) $(MLIS)
 
-flush:
-	@- $(RM) $(OBJECTS) $(CMIS) $(MLIS) $(BIN) vparser.ml vlexar.ml
+purge:
+	make clean
+	@- $(RM) vparser.ml vlexar.ml vparser.output
 

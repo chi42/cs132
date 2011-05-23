@@ -61,4 +61,7 @@ type t_nodes =
   | Ident of t_nodes
   | Code_label of string 
   | Eol of t_nodes list
- 
+
+type ('a, 'b, 'c) temp_type = 
+  | TT_one of 'a 
+  | TT_two of 'b
