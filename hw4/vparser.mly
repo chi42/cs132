@@ -31,17 +31,15 @@ program:
     { Program $2 }
 
 p_func_or_ds:
-  | func p_func_or_ds
-    { $1::$2 }
-  | data_segment p_func_or_ds
+  | func_dats_instr p_func_or_ds
     { $1::$2 }
   | 
     { [] }
 
 //(* DataSegment ::= ( "const" | "var" ) Ident Eol ( ( DataValue )+ Eol )* *)
-data_segment:
-  | ds_const_or_var ident eol dv_eol_star
-    { Data_segment ($1,$2,$4)} 
+//data_segment:
+//  | ds_const_or_var ident eol dv_eol_star
+//    { Data_segment ($1,$2,$4)} 
 
 ds_const_or_var:
   | CONST
@@ -68,9 +66,9 @@ dv_plus_follow:
 //(* Function ::= "func" Ident ( "(" ( VarRefNoReg )* ")" )? ( "[" "in" <Digits>
 // * "," "out" <Digits> "," "local" <Digits> "]" )? Eol ( ( CodeLabel ( Eol | Instr )
 // * | Instr ) )* *)
-func: 
-  | FUNC ident func1_wrapper func2_wrapper eol func3_wrapper 
-    { Function ($2,$3,$4,$6) }
+//func: 
+//  | FUNC ident func1_wrapper func2_wrapper eol func3_wrapper 
+//    { Function ($2,$3,$4,$6) }
 
 func1_wrapper: 
   | LPAREN vrnr_star RPAREN 
@@ -107,6 +105,48 @@ func3_follow:
     { [] } 
   | instr
     { [$1] } 
+
+
+func_dats_instr:
+  | FUNC ident func1_wrapper func2_wrapper eol func3_wrapper 
+    { Function ($2,$3,$4,$6) }
+  | ds_const_or_var ident eol dv_eol_star
+    { Data_segment ($1,$2,$4)} 
+
+  | FUNC EQUAL mem_ref eol 
+    { Mem_read ((Plain_ident "func"),$3) }
+  | FUNC EQUAL operand eol 
+    { Assign ((Plain_ident "func"),$3) }   
+  | FUNC EQUAL CALL func_addr call_2 eol 
+    { Call ([(Plain_ident "func")],$4,$5) }
+  | FUNC EQUAL ident LPAREN builtin_2 RPAREN eol 
+    { Builtin ([(Plain_ident "func")],$3,$5) } 
+  | FUNC LPAREN builtin_2 RPAREN eol 
+    { Builtin ([],(Plain_ident "func"),$3) } 
+
+  | CONST EQUAL mem_ref eol 
+    { Mem_read ((Plain_ident "const"),$3) }
+  | CONST EQUAL operand eol 
+    { Assign ((Plain_ident "const"),$3) }   
+  | CONST EQUAL CALL func_addr call_2 eol 
+    { Call ([(Plain_ident "const")],$4,$5) }
+  | CONST EQUAL ident LPAREN builtin_2 RPAREN eol 
+    { Builtin ([(Plain_ident "const")],$3,$5) } 
+  | CONST LPAREN builtin_2 RPAREN eol 
+    { Builtin ([],(Plain_ident "const"),$3) } 
+
+  | VAR EQUAL mem_ref eol 
+    { Mem_read ((Plain_ident "var"),$3) }
+  | VAR EQUAL operand eol 
+    { Assign ((Plain_ident "var"),$3) }   
+  | VAR EQUAL CALL func_addr call_2 eol 
+    { Call ([(Plain_ident "var")],$4,$5) }
+  | VAR EQUAL ident LPAREN builtin_2 RPAREN eol 
+    { Builtin ([(Plain_ident "var")],$3,$5) } 
+  | VAR LPAREN builtin_2 RPAREN eol 
+    { Builtin ([],(Plain_ident "var"),$3) } 
+
+
 
 //(* Instr ::= ( Return | MemRead | MemWrite | Assign | Branch | Goto | Call | 
 // * BuiltIn ) *)
@@ -202,11 +242,14 @@ instr:
   | IF_NOT LPAREN builtin_2 RPAREN eol 
     { Builtin ([],(Plain_ident "if0"),$3) } 
 
-  | PLAIN_IDENT instr_ident_follow 
-
-  | 
-  
-( <PlainIdent> | "func" | "const" | "var" | 
+  | REG_IDENT EQUAL mem_ref eol 
+    { Mem_read ((Reg_ident $1),$3) }
+  | REG_IDENT EQUAL operand eol 
+    { Assign ((Reg_ident $1),$3) }
+  | REG_IDENT EQUAL CALL func_addr call_2 eol 
+    { Call ([Reg_ident $1],$4,$5) }
+  | REG_IDENT EQUAL ident LPAREN builtin_2 RPAREN eol 
+    { Builtin ([Reg_ident $1],$3,$5) } 
 
   | global_mem_ref EQUAL operand eol
     { Mem_write ((Mem_ref $1),$3) } 
@@ -336,9 +379,9 @@ func_ref:
 //(* VarRef  ::=   ( Ident | <RegIdent> ) *)
 var_ref:
   | ident
-    { Var_ref $1 }
+    { $1 }
   | REG_IDENT
-    { Var_ref (Reg_ident $1) } 
+    { (Reg_ident $1) } 
 
 //(* OperandNoReg  ::=   Operand *)
 operand_no_reg:
