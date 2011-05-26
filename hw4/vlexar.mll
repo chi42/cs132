@@ -14,33 +14,21 @@ let ident = ident_head ident_rest*
 
 rule token = parse
     (* non-newline spaces and whitespace *)
-  | ' '
-  | '\t' 
+  | [' ' '\t' ]
   | "//" [^ '\n' '\r']*  
   | "/*" [^ '*']* '*' ('*' | [^ '*' '/'] [^ '*']* '*')* '/' 
+    { token lexbuf }
     (* end of line *)
-  | (('\r')* '\n' ([' ' '\t'])*)+ 
+  | (('\r')* '\n')+ 
     { EOL } 
     (* end of file *)
   | eof
-  { EOF } 
+    { EOF } 
     (* numbers, positive and negative *)
   | ("-" digits) as str
     { NEG_DIGITS str } 
   | digits as str 
     { DIGITS str } 
-    (* strings of identifiers *)
-  | ident as str
-    { PLAIN_IDENT str } 
-  | ("$" ident) as str
-    { REG_IDENT str }
-  | (ident ":") as str
-    { CODE_LABEL_IDENT str } 
-  | (":" ident) as str
-    { LABEL_REF_IDENT str }
-    (* strings *)
-  | '"'("\\\"" | [' '-'~'] )* '"' as str
-    { LIT_STR str }  
     (* reserved keywords *)
   | "const"     { CONST }
   | "var"       { VAR } 
@@ -61,5 +49,17 @@ rule token = parse
   | "["         { LBRACKET }
   | "]"         { RBRACKET } 
   | ","         { COMMA } 
+    (* strings of identifiers *)
+  | ident as str
+    { PLAIN_IDENT str } 
+  | ("$" ident) as str
+    { REG_IDENT str }
+  | (ident ":") as str
+    { CODE_LABEL_IDENT str } 
+  | (":" ident) as str
+    { LABEL_REF_IDENT str }
+    (* strings *)
+  | '"'("\\\"" | [' '-'~'] )* '"' as str
+    { LIT_STR str }  
 
 

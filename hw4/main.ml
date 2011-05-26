@@ -6,7 +6,7 @@ open Vtypes
 let main () = 
   try 
     (* lex and parse, build AST *)
-    let tree = (Vparser.program Vlexar.token (Lexing.from_channel stdin)) in
+    match (Vparser.program Vlexar.token (Lexing.from_channel stdin)) with _ -> 
       Printf.printf "Success!\n";
       exit 0
   with _ ->

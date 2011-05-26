@@ -37,9 +37,6 @@ p_func_or_ds:
     { [] }
 
 //(* DataSegment ::= ( "const" | "var" ) Ident Eol ( ( DataValue )+ Eol )* *)
-//data_segment:
-//  | ds_const_or_var ident eol dv_eol_star
-//    { Data_segment ($1,$2,$4)} 
 
 ds_const_or_var:
   | CONST
@@ -113,38 +110,38 @@ func_dats_instr:
   | ds_const_or_var ident eol dv_eol_star
     { Data_segment ($1,$2,$4)} 
 
-  | FUNC EQUAL mem_ref eol 
-    { Mem_read ((Plain_ident "func"),$3) }
-  | FUNC EQUAL operand eol 
-    { Assign ((Plain_ident "func"),$3) }   
-  | FUNC EQUAL CALL func_addr call_2 eol 
-    { Call ([(Plain_ident "func")],$4,$5) }
-  | FUNC EQUAL ident LPAREN builtin_2 RPAREN eol 
-    { Builtin ([(Plain_ident "func")],$3,$5) } 
-  | FUNC LPAREN builtin_2 RPAREN eol 
-    { Builtin ([],(Plain_ident "func"),$3) } 
-
-  | CONST EQUAL mem_ref eol 
-    { Mem_read ((Plain_ident "const"),$3) }
-  | CONST EQUAL operand eol 
-    { Assign ((Plain_ident "const"),$3) }   
-  | CONST EQUAL CALL func_addr call_2 eol 
-    { Call ([(Plain_ident "const")],$4,$5) }
-  | CONST EQUAL ident LPAREN builtin_2 RPAREN eol 
-    { Builtin ([(Plain_ident "const")],$3,$5) } 
-  | CONST LPAREN builtin_2 RPAREN eol 
-    { Builtin ([],(Plain_ident "const"),$3) } 
-
-  | VAR EQUAL mem_ref eol 
-    { Mem_read ((Plain_ident "var"),$3) }
-  | VAR EQUAL operand eol 
-    { Assign ((Plain_ident "var"),$3) }   
-  | VAR EQUAL CALL func_addr call_2 eol 
-    { Call ([(Plain_ident "var")],$4,$5) }
-  | VAR EQUAL ident LPAREN builtin_2 RPAREN eol 
-    { Builtin ([(Plain_ident "var")],$3,$5) } 
-  | VAR LPAREN builtin_2 RPAREN eol 
-    { Builtin ([],(Plain_ident "var"),$3) } 
+//  | FUNC EQUAL mem_ref eol 
+//    { Mem_read ((Plain_ident "func"),$3) }
+//  | FUNC EQUAL operand eol 
+//    { Assign ((Plain_ident "func"),$3) }   
+//  | FUNC EQUAL CALL func_addr call_2 eol 
+//    { Call ([(Plain_ident "func")],$4,$5) }
+//  | FUNC EQUAL ident LPAREN builtin_2 RPAREN eol 
+//    { Builtin ([(Plain_ident "func")],$3,$5) } 
+//  | FUNC LPAREN builtin_2 RPAREN eol 
+//    { Builtin ([],(Plain_ident "func"),$3) } 
+//
+//  | CONST EQUAL mem_ref eol 
+//    { Mem_read ((Plain_ident "const"),$3) }
+//  | CONST EQUAL operand eol 
+//    { Assign ((Plain_ident "const"),$3) }   
+//  | CONST EQUAL CALL func_addr call_2 eol 
+//    { Call ([(Plain_ident "const")],$4,$5) }
+//  | CONST EQUAL ident LPAREN builtin_2 RPAREN eol 
+//    { Builtin ([(Plain_ident "const")],$3,$5) } 
+//  | CONST LPAREN builtin_2 RPAREN eol 
+//    { Builtin ([],(Plain_ident "const"),$3) } 
+//
+//  | VAR EQUAL mem_ref eol 
+//    { Mem_read ((Plain_ident "var"),$3) }
+//  | VAR EQUAL operand eol 
+//    { Assign ((Plain_ident "var"),$3) }   
+//  | VAR EQUAL CALL func_addr call_2 eol 
+//    { Call ([(Plain_ident "var")],$4,$5) }
+//  | VAR EQUAL ident LPAREN builtin_2 RPAREN eol 
+//    { Builtin ([(Plain_ident "var")],$3,$5) } 
+//  | VAR LPAREN builtin_2 RPAREN eol 
+//    { Builtin ([],(Plain_ident "var"),$3) } 
 
 
 
@@ -251,11 +248,21 @@ instr:
   | REG_IDENT EQUAL ident LPAREN builtin_2 RPAREN eol 
     { Builtin ([Reg_ident $1],$3,$5) } 
 
+  | PLAIN_IDENT EQUAL mem_ref eol   
+    { Mem_read ((Plain_ident $1),$3) } 
+  | PLAIN_IDENT EQUAL operand eol 
+    { Assign ((Plain_ident $1),$3) }   
+  | PLAIN_IDENT EQUAL CALL func_addr call_2 eol 
+    { Call ([Plain_ident $1],$4,$5) }
+  | PLAIN_IDENT EQUAL ident LPAREN builtin_2 RPAREN eol 
+    { Builtin ([Plain_ident $1],$3,$5) } 
+  | PLAIN_IDENT LPAREN builtin_2 RPAREN eol 
+    { Builtin ([],(Plain_ident $1),$3) } 
+
   | global_mem_ref EQUAL operand eol
     { Mem_write ((Mem_ref $1),$3) } 
   | CALL func_addr call_2 eol 
     { Call ([],$2,$3) }
-
 
 
 //(* Assign ::= VarRef "=" Operand Eol *)
@@ -288,16 +295,20 @@ gmf_1:
     { [(T_plus,(Digits $2))] }
   | MINUS DIGITS
     { [(T_minus,(Digits $2))] }
+  | { [] }
 
 
 //(* Call ::= ( VarRefNoReg "=" )? "call" FuncAddr ( "(" ( OperandNoReg )* ")"
 // *              )? Eol *)
     
 call_2:
-  | LPAREN operand_no_reg RPAREN call_2
-    { $2::$4 } 
-  | 
-    { [] }
+  | LPAREN call_2_onr_star RPAREN 
+    { $2 }
+
+call_2_onr_star:
+  | operand_no_reg call_2_onr_star
+    { $1::$2 }
+  | { [] }
 
 //(* BuiltIn   ::=   ( VarRef "=" )? Ident "(" ( Operand )* ")" Eol *)
 
