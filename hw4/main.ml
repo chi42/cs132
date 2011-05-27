@@ -2,6 +2,7 @@ open Vparser
 open Vlexar 
 open Exceptions 
 open Vtypes
+open Basic_blocks
 
 let main () = 
   try 

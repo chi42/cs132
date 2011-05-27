@@ -101,7 +101,7 @@ func3_follow:
   | eol  
     { [] } 
   | instr
-    { [$1] } 
+    { [Instr $1] } 
 
 
 func_dats_instr:

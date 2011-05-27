@@ -1,8 +1,8 @@
 BIN = V2VM
 
-OBJECTS = exceptions.cmo vtypes.cmo vlexar.cmo vparser.cmo main.cmo
+OBJECTS = exceptions.cmo vtypes.cmo vlexar.cmo vparser.cmo basic_blocks.cmo main.cmo
 
-CMIS = vlexar.cmi vparser.cmi vtypes.cmi exceptions.cmi main.cmi
+CMIS = vlexar.cmi vparser.cmi vtypes.cmi exceptions.cmi main.cmi basic_blocks.cmi
 
 MLIS = vparser.mli
 
@@ -30,7 +30,10 @@ vparser.cmo: vparser.mly vlexar.mll vtypes.ml exceptions.ml
 	$(CC) -c vlexar.ml
 	$(CC) -c vparser.ml
 
-main.cmo: main.ml vparser.mly vlexar.mll exceptions.ml vtypes.ml
+basic_blocks.cmo: basic_blocks.ml exceptions.ml vtypes.ml
+	$(CC) -c basic_blocks.ml
+
+main.cmo: main.ml vparser.mly vlexar.mll exceptions.ml vtypes.ml basic_blocks.ml
 	$(CC) -c main.ml
 
 clean:
