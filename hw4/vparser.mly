@@ -110,40 +110,6 @@ func_dats_instr:
   | ds_const_or_var ident eol dv_eol_star
     { Data_segment ($1,$2,$4)} 
 
-//  | FUNC EQUAL mem_ref eol 
-//    { Mem_read ((Plain_ident "func"),$3) }
-//  | FUNC EQUAL operand eol 
-//    { Assign ((Plain_ident "func"),$3) }   
-//  | FUNC EQUAL CALL func_addr call_2 eol 
-//    { Call ([(Plain_ident "func")],$4,$5) }
-//  | FUNC EQUAL ident LPAREN builtin_2 RPAREN eol 
-//    { Builtin ([(Plain_ident "func")],$3,$5) } 
-//  | FUNC LPAREN builtin_2 RPAREN eol 
-//    { Builtin ([],(Plain_ident "func"),$3) } 
-//
-//  | CONST EQUAL mem_ref eol 
-//    { Mem_read ((Plain_ident "const"),$3) }
-//  | CONST EQUAL operand eol 
-//    { Assign ((Plain_ident "const"),$3) }   
-//  | CONST EQUAL CALL func_addr call_2 eol 
-//    { Call ([(Plain_ident "const")],$4,$5) }
-//  | CONST EQUAL ident LPAREN builtin_2 RPAREN eol 
-//    { Builtin ([(Plain_ident "const")],$3,$5) } 
-//  | CONST LPAREN builtin_2 RPAREN eol 
-//    { Builtin ([],(Plain_ident "const"),$3) } 
-//
-//  | VAR EQUAL mem_ref eol 
-//    { Mem_read ((Plain_ident "var"),$3) }
-//  | VAR EQUAL operand eol 
-//    { Assign ((Plain_ident "var"),$3) }   
-//  | VAR EQUAL CALL func_addr call_2 eol 
-//    { Call ([(Plain_ident "var")],$4,$5) }
-//  | VAR EQUAL ident LPAREN builtin_2 RPAREN eol 
-//    { Builtin ([(Plain_ident "var")],$3,$5) } 
-//  | VAR LPAREN builtin_2 RPAREN eol 
-//    { Builtin ([],(Plain_ident "var"),$3) } 
-
-
 
 //(* Instr ::= ( Return | MemRead | MemWrite | Assign | Branch | Goto | Call | 
 // * BuiltIn ) *)
@@ -258,6 +224,43 @@ instr:
     { Builtin ([Plain_ident $1],$3,$5) } 
   | PLAIN_IDENT LPAREN builtin_2 RPAREN eol 
     { Builtin ([],(Plain_ident $1),$3) } 
+
+//  | FUNC EQUAL mem_ref eol 
+//    { Mem_read ((Plain_ident "func"),$3) }
+//  | FUNC EQUAL operand eol 
+//    { Assign ((Plain_ident "func"),$3) }   
+//  | FUNC EQUAL CALL func_addr call_2 eol 
+//    { Call ([(Plain_ident "func")],$4,$5) }
+//  | FUNC EQUAL ident LPAREN builtin_2 RPAREN eol 
+//    { Builtin ([(Plain_ident "func")],$3,$5) } 
+//  | FUNC LPAREN builtin_2 RPAREN eol 
+//    { Builtin ([],(Plain_ident "func"),$3) } 
+//
+//  | CONST EQUAL mem_ref eol 
+//    { Mem_read ((Plain_ident "const"),$3) }
+//  | CONST EQUAL operand eol 
+//    { Assign ((Plain_ident "const"),$3) }   
+//  | CONST EQUAL CALL func_addr call_2 eol 
+//    { Call ([(Plain_ident "const")],$4,$5) }
+//  | CONST EQUAL ident LPAREN builtin_2 RPAREN eol 
+//    { Builtin ([(Plain_ident "const")],$3,$5) } 
+//  | CONST LPAREN builtin_2 RPAREN eol 
+//    { Builtin ([],(Plain_ident "const"),$3) } 
+//
+//  | VAR EQUAL mem_ref eol 
+//    { Mem_read ((Plain_ident "var"),$3) }
+//  | VAR EQUAL operand eol 
+//    { Assign ((Plain_ident "var"),$3) }   
+//  | VAR EQUAL CALL func_addr call_2 eol 
+//    { Call ([(Plain_ident "var")],$4,$5) }
+//  | VAR EQUAL ident LPAREN builtin_2 RPAREN eol 
+//    { Builtin ([(Plain_ident "var")],$3,$5) } 
+//  | VAR LPAREN builtin_2 RPAREN eol 
+//    { Builtin ([],(Plain_ident "var"),$3) } 
+
+
+
+
 
   | global_mem_ref EQUAL operand eol
     { Mem_write ((Mem_ref $1),$3) } 
