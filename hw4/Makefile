@@ -37,7 +37,7 @@ debug_printers.cmo: debug_printers.ml exceptions.ml vtypes.ml
 basic_blocks.cmo: basic_blocks.ml exceptions.ml vtypes.ml debug_printers.ml
 	$(CC) -c basic_blocks.ml
 
-main.cmo: main.ml vparser.mly vlexar.mll exceptions.ml vtypes.ml basic_blocks.ml
+main.cmo: main.ml vparser.mly vlexar.mll exceptions.ml vtypes.ml basic_blocks.ml debug_printers.ml
 	$(CC) -c main.ml
 
 clean:

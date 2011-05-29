@@ -397,7 +397,7 @@ var_ref:
 //(* OperandNoReg  ::=   Operand *)
 operand_no_reg:
   | operand
-    { Operand_no_reg $1 }
+    { $1 }
 
 //(* LitInt  ::=   ( <Digits> | <NegDigits> ) *) 
 lit_int:
