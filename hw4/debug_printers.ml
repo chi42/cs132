@@ -11,13 +11,15 @@ let bb_print n =
 
 let rec print_type x =
   match x with 
+  | Dummy _ -> Printf.printf "dummy\n" 
+
   | Cl_and_instr _ -> Printf.printf "Cl_and_instr\n" 
-  | Neg_digits _ -> Printf.printf "Neg_digits\n" 
-  | Digits _ -> Printf.printf "Digits\n" 
-  | Plain_ident _ -> Printf.printf "Plain_ident\n" 
-  | Reg_ident _ -> Printf.printf "Reg_ident\n" 
-  | Code_label_ident _ -> Printf.printf "Code_label_ident\n" 
-  | Label_ref_ident _ -> Printf.printf "Label_ref_ident\n" 
+  | Neg_digits a -> Printf.printf "Neg_digits: %s\n" a
+  | Digits a -> Printf.printf "Digits: %s\n" a
+  | Plain_ident a -> Printf.printf "Plain_ident: %s \n" a
+  | Reg_ident a -> Printf.printf "Reg_ident: %s\n" a
+  | Code_label_ident a -> Printf.printf "Code_label_ident: %s\n" a
+  | Label_ref_ident a -> Printf.printf "Label_ref_ident:%s \n" a
   | Program _ -> Printf.printf "Program\n" 
   | Data_segment _ -> Printf.printf "Data_segment\n" 
   | Function _ -> Printf.printf "Function\n" 

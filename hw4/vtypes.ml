@@ -1,5 +1,8 @@
 (* for building the parse tree *)
 type t_nodes = 
+    (* a place holder *)
+  | Dummy 
+
   | T_const
   | T_var
   | T_in
