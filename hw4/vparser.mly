@@ -393,9 +393,9 @@ func_ref:
 //(* VarRef  ::=   ( Ident | <RegIdent> ) *)
 var_ref:
   | ident
-    { $1 }
+    { Var_ref ($1) }
   | REG_IDENT
-    { (Reg_ident $1) } 
+    { Var_ref (Reg_ident $1) } 
 
 //(* OperandNoReg  ::=   Operand *)
 operand_no_reg:

@@ -11,7 +11,7 @@ let main () =
   
     (match prog with 
       | Program lis -> 
-        (match List.map Basic_blocks.block_builder lis with _ ->  ())
+        (match Basic_blocks.block_builder lis with _ ->  ())
       | _ -> ()
     );
 
