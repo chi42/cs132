@@ -117,91 +117,91 @@ instr:
   | GOTO code_addr eol 
     { Goto $2 } 
   | GOTO EQUAL mem_ref eol   
-    { Mem_read ((Plain_ident "goto"),$3) } 
+    { Mem_read (Var_ref ((Plain_ident "goto")),$3) } 
   | GOTO EQUAL operand eol 
-    { Assign ((Plain_ident "goto"),$3) }   
+    { Assign (Var_ref ((Plain_ident "goto")),$3) }   
   | GOTO EQUAL CALL func_addr call_2 eol 
-    { Call ([(Plain_ident "goto")],$4,$5) }
+    { Call ([(Var_ref (Plain_ident "goto"))],$4,$5) }
   | GOTO EQUAL ident LPAREN builtin_2 RPAREN eol 
-    { Builtin ([(Plain_ident "goto")],$3,$5) } 
+    { Builtin ([(Var_ref (Plain_ident "goto"))],$3,$5) } 
   | GOTO LPAREN builtin_2 RPAREN eol 
     { Builtin ([],(Plain_ident "goto"),$3) } 
 
   | RET onr_question eol 
     { Return $2 } 
   | RET EQUAL mem_ref eol   
-    { Mem_read ((Plain_ident "ret"),$3) } 
+    { Mem_read (Var_ref ((Plain_ident "ret")),$3) } 
   | RET EQUAL operand eol 
-    { Assign ((Plain_ident "ret"),$3) }   
+    { Assign (Var_ref ((Plain_ident "ret")),$3) }   
   | RET EQUAL CALL func_addr call_2 eol 
-    { Call ([Plain_ident "ret"],$4,$5) }
+    { Call ([Var_ref (Plain_ident "ret")],$4,$5) }
   | RET EQUAL ident LPAREN builtin_2 RPAREN eol 
-    { Builtin ([Plain_ident "ret"],$3,$5) } 
+    { Builtin ([Var_ref (Plain_ident "ret")],$3,$5) } 
   | RET LPAREN builtin_2 RPAREN eol 
     { Builtin ([],(Plain_ident "ret"),$3) } 
 
   | IN DIGITS EQUAL operand eol
     { Mem_write ((Mem_ref (Stack_mem_ref (T_in,(Digits $2)))),$4) } 
   | IN EQUAL mem_ref eol   
-    { Mem_read ((Plain_ident "in"),$3) } 
+    { Mem_read (Var_ref ((Plain_ident "in")),$3) } 
   | IN EQUAL operand eol 
-    { Assign ((Plain_ident "in"),$3) }   
+    { Assign (Var_ref ((Plain_ident "in")),$3) }   
   | IN EQUAL CALL func_addr call_2 eol 
-    { Call ([Plain_ident "in"],$4,$5) }
+    { Call ([Var_ref (Plain_ident "in")],$4,$5) }
   | IN EQUAL ident LPAREN builtin_2 RPAREN eol 
-    { Builtin ([Plain_ident "in"],$3,$5) } 
+    { Builtin ([Var_ref (Plain_ident "in")],$3,$5) } 
   | IN LPAREN builtin_2 RPAREN eol 
     { Builtin ([],(Plain_ident "in"),$3) } 
 
   | OUT DIGITS EQUAL operand eol
     { Mem_write ((Mem_ref (Stack_mem_ref (T_out,(Digits $2)))),$4) } 
   | OUT EQUAL mem_ref eol   
-    { Mem_read ((Plain_ident "out"),$3) } 
+    { Mem_read (Var_ref ((Plain_ident "out")),$3) } 
   | OUT EQUAL operand eol 
-    { Assign ((Plain_ident "out"),$3) }   
+    { Assign (Var_ref ((Plain_ident "out")),$3) }   
   | OUT EQUAL CALL func_addr call_2 eol 
-    { Call ([Plain_ident "out"],$4,$5) }
+    { Call ([Var_ref (Plain_ident "out")],$4,$5) }
   | OUT EQUAL ident LPAREN builtin_2 RPAREN eol 
-    { Builtin ([Plain_ident "out"],$3,$5) } 
+    { Builtin ([Var_ref (Plain_ident "out")],$3,$5) } 
   | OUT LPAREN builtin_2 RPAREN eol 
     { Builtin ([],(Plain_ident "out"),$3) } 
 
   | LOCAL DIGITS EQUAL operand eol
     { Mem_write ((Mem_ref (Stack_mem_ref (T_local,(Digits $2)))),$4) } 
   | LOCAL EQUAL mem_ref eol   
-    { Mem_read ((Plain_ident "local"),$3) } 
+    { Mem_read (Var_ref ((Plain_ident "local")),$3) } 
   | LOCAL EQUAL operand eol 
-    { Assign ((Plain_ident "local"),$3) }   
+    { Assign (Var_ref ((Plain_ident "local")),$3) }   
   | LOCAL EQUAL CALL func_addr call_2 eol 
-    { Call ([Plain_ident "local"],$4,$5) }
+    { Call ([Var_ref (Plain_ident "local")],$4,$5) }
   | LOCAL EQUAL ident LPAREN builtin_2 RPAREN eol 
-    { Builtin ([Plain_ident "local"],$3,$5) } 
+    { Builtin ([Var_ref (Plain_ident "local")],$3,$5) } 
   | LOCAL LPAREN builtin_2 RPAREN eol 
     { Builtin ([],(Plain_ident "local"),$3) } 
 
   | IF operand GOTO code_label_ref eol 
     { Branch (T_if,$2,$4) }
   | IF EQUAL mem_ref eol   
-    { Mem_read ((Plain_ident "if"),$3) } 
+    { Mem_read (Var_ref ((Plain_ident "if")),$3) } 
   | IF EQUAL operand eol 
-    { Assign ((Plain_ident "if"),$3) }   
+    { Assign (Var_ref ((Plain_ident "if")),$3) }   
   | IF EQUAL CALL func_addr call_2 eol 
-    { Call ([Plain_ident "if"],$4,$5) }
+    { Call ([Var_ref (Plain_ident "if")],$4,$5) }
   | IF EQUAL ident LPAREN builtin_2 RPAREN eol 
-    { Builtin ([Plain_ident "if"],$3,$5) } 
+    { Builtin ([Var_ref (Plain_ident "if")],$3,$5) } 
   | IF LPAREN builtin_2 RPAREN eol 
     { Builtin ([],(Plain_ident "if"),$3) } 
 
   | IF_NOT operand GOTO code_label_ref eol 
     { Branch (T_if_not,$2,$4) }
   | IF_NOT EQUAL mem_ref eol   
-    { Mem_read ((Plain_ident "if0"),$3) } 
+    { Mem_read (Var_ref ((Plain_ident "if0")),$3) } 
   | IF_NOT EQUAL operand eol 
-    { Assign ((Plain_ident "if0"),$3) }   
+    { Assign (Var_ref ((Plain_ident "if0")),$3) }   
   | IF_NOT EQUAL CALL func_addr call_2 eol 
-    { Call ([Plain_ident "if0"],$4,$5) }
+    { Call ([Var_ref (Plain_ident "if0")],$4,$5) }
   | IF_NOT EQUAL ident LPAREN builtin_2 RPAREN eol 
-    { Builtin ([Plain_ident "if0"],$3,$5) } 
+    { Builtin ([Var_ref (Plain_ident "if0")],$3,$5) } 
   | IF_NOT LPAREN builtin_2 RPAREN eol 
     { Builtin ([],(Plain_ident "if0"),$3) } 
 
@@ -215,13 +215,13 @@ instr:
     { Builtin ([Reg_ident $1],$3,$5) } 
 
   | PLAIN_IDENT EQUAL mem_ref eol   
-    { Mem_read ((Plain_ident $1),$3) } 
+    { Mem_read (Var_ref ((Plain_ident $1)),$3) } 
   | PLAIN_IDENT EQUAL operand eol 
-    { Assign ((Plain_ident $1),$3) }   
+    { Assign (Var_ref ((Plain_ident $1)),$3) }   
   | PLAIN_IDENT EQUAL CALL func_addr call_2 eol 
-    { Call ([Plain_ident $1],$4,$5) }
+    { Call ([Var_ref (Plain_ident $1)],$4,$5) }
   | PLAIN_IDENT EQUAL ident LPAREN builtin_2 RPAREN eol 
-    { Builtin ([Plain_ident $1],$3,$5) } 
+    { Builtin ([Var_ref (Plain_ident $1)],$3,$5) } 
   | PLAIN_IDENT LPAREN builtin_2 RPAREN eol 
     { Builtin ([],(Plain_ident $1),$3) } 
 
@@ -257,10 +257,6 @@ instr:
 //    { Builtin ([(Plain_ident "var")],$3,$5) } 
 //  | VAR LPAREN builtin_2 RPAREN eol 
 //    { Builtin ([],(Plain_ident "var"),$3) } 
-
-
-
-
 
   | global_mem_ref EQUAL operand eol
     { Mem_write ((Mem_ref $1),$3) } 
@@ -388,7 +384,7 @@ data_segment_ref:
 //(* FuncRef   ::=   <LabelRefIdent> *)
 func_ref:
   | LABEL_REF_IDENT
-    { Func_ref (Label_ref_ident $1) }  
+    { (Label_ref_ident $1) }  
 
 //(* VarRef  ::=   ( Ident | <RegIdent> ) *)
 var_ref:

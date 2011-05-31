@@ -52,7 +52,9 @@ let rec print_type x =
   | Var_ref _ -> Printf.printf "Var_ref\n" 
   | Var_ref_no_reg _ -> Printf.printf "Var_ref_no_reg\n" 
   | Operand_no_reg _ -> Printf.printf "Operand_no_reg\n" 
-  | Lit_int _ -> Printf.printf "Lit_int\n" 
+  | Lit_int (Neg_digits f0) -> Printf.printf "Lit_int - Neg_digits: %s\n" f0  
+  | Lit_int (Digits f0) -> Printf.printf "Lit_int - Digits: %s\n" f0  
+  | Lit_int _ -> Printf.printf "lit_int - token\n";
   | Lit_str _ -> Printf.printf "Lit_str\n" 
   | Ident _ -> Printf.printf "Ident\n" 
   | Code_label _ -> Printf.printf "Code_label\n" 
